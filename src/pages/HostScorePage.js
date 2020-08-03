@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import MaterialTable from 'material-table';
-import Grid from '@material-ui/core/Grid';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
 
 import {forwardRef} from 'react';
 
@@ -19,6 +19,8 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+
+import TabConent from '../component/TabContent';
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -49,289 +51,97 @@ export default class HostScorePage extends Component {
     super(props);
     this.state = {
       userRole: '',
+      selectedTab: 0,
     };
   }
   componentDidMount() {}
   componentDidUpdate() {}
 
-  columnsHost = [
-    {field: 'round', title: 'Round', width: '5%'},
-    {field: 'number', title: 'Q #', width: '90px', },
-    {field: 'answer', title: 'Correct A',},
-  ];
-  columns = [
-    {
-      field: 'number',
-      title: 'Q #',
-      type: 'numeric',
-      width: '15%',
-      cellStyle: {textAlign: 'left'},
-      sorting: false,
-      headerStyle: {textAlign: 'left'},
-      editable: 'never',
-    },
-    {
-      field: 'answer',
-      title: 'Correct A',
-      sorting: false,
-      editable: 'never',
-    },
-    {
-      field: 'teamInput',
-      title: 'Team A',
-      sorting: false,
-      editable: 'never',
-    },
-    {
-      field: 'match',
-      title: 'M',
-      type: 'boolean',
-      width: '5%',
-      headerStyle: {textAlign: 'right'},
-      editable: 'never',
-    },
-    {
-      field: 'point',
-      title: 'Point',
-      type: 'boolean',
-      width: '5%',
-      editable: 'always',
-    },
-  ];
-  rows = [
-    {
-      round: 'Music',
-      number: '1',
-      answer: 'Remote Control',
-      teamInput: 'remo mom',
-      match: 'true',
-      point: 'yes',
-    },
-    {
-      round: 'Music',
-      number: '2',
-      answer: 'Remote Control',
-      teamInput: 'remo mom',
-      match: 'true',
-      point: 'yes',
-    },
-  ];
+  handleTabChange(event, newValue) {
+    // console.log(event, newValue);
+    this.setState({selectedTab: newValue});
+  }
   render() {
     return (
       <div style={{margin: '32px', padding: '32px'}}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <MaterialTable
-              title="Music round"
-              columns={this.columnsHost}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 1000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Editable Example"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              title="Editable Example"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-        </Grid>
-      </div>
+        <Tabs
+          value={this.state.selectedTab}
+          onChange={(event, newValue) => this.handleTabChange(event, newValue)}
+          aria-label="simple tabs example"
+        >
+          <Tab label="Round 1" value={0} />
+          <Tab label="Round 2" value={1} />
+          <Tab label="Round 3" value={2} />
+          <Tab label="Round 4" value={3} />
+          <Tab label="Round 5" value={4} />
+          <Tab label="Round 6" value={5} />
+          <Tab label="Round 7" value={6} />
+          <Tab label="Round 8" value={7} />
+        </Tabs>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 0}
+          role="tabpanel"
+          value={0}
+          index={0}
+        >
+          <TabConent round='Tourist' />
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 1}
+          role="tabpanel"
+          value={1}
+          index={1}
+        >
+          <TabConent round='Picture'/>
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 2}
+          role="tabpanel"
+          value={2}
+          index={2}
+        >
+          <TabConent round='Food' />
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 3}
+          role="tabpanel"
+          value={2}
+          index={2}
+        >
+          <TabConent round='Onomatopoeia'/>
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 4}
+          role="tabpanel"
+          value={2}
+          index={2}
+        >
+          <TabConent title={'Onamonapia'}/>
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 5}
+          role="tabpanel"
+          value={2}
+          index={2}
+        >
+          <TabConent round='Sound'/>
+        </div>
+        <div
+          style={{paddingTop: '16px'}}
+          hidden={this.state.selectedTab !== 6}
+          role="tabpanel"
+          value={2}
+          index={2}
+        >
+          <TabConent round='Why so werid, Japan'/>
+        </div>
+    </div>
     );
   }
 }
