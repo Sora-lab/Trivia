@@ -67,7 +67,7 @@ export default class HostScorePage extends Component {
         <Tabs
           value={this.state.selectedTab}
           onChange={(event, newValue) => this.handleTabChange(event, newValue)}
-          aria-label="simple tabs example"
+          aria-label="trivia rounds"
         >
           <Tab label="Round 1" value={0} />
           <Tab label="Round 2" value={1} />
