@@ -5,7 +5,7 @@ import Tabs from '@material-ui/core/Tabs';
 
 import firebase from 'firebase';
 
-import AnswerTable from '../component/AnswerTable';
+import TeamAnswerEntryTable from '../component/TeamAnswerEntryTable';
 
 export default class TeamPage extends Component {
   constructor(props) {
@@ -35,7 +35,7 @@ export default class TeamPage extends Component {
       .once('value');
     const teamData = snapshot.val();
     const rounds = teamData.rounds;
-    console.log(rounds);
+    console.log('getSnapshot', rounds);
     let lockedRound = {};
     for (const key in rounds) {
       if (rounds.hasOwnProperty(key)) {
@@ -77,7 +77,7 @@ export default class TeamPage extends Component {
           <Tab label="Round 7" value={6} />
           <Tab label="Round 8" value={7} />
         </Tabs>
-        <AnswerTable
+        <TeamAnswerEntryTable
           locked={roundLocked[round]}
           round={this.state.selectedTab}
         />

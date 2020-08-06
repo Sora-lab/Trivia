@@ -1,167 +1,150 @@
 import React, {Component} from 'react';
-import Switch from '@material-ui/core/Switch';
-import Card from '@material-ui/core/Card';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Input from '@material-ui/core/Input';
+import MaterialTable from 'material-table';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+
+import {forwardRef} from 'react';
+
+import AddBox from '@material-ui/icons/AddBox';
+import ArrowDownward from '@material-ui/icons/ArrowDownward';
+import Check from '@material-ui/icons/Check';
+import ChevronLeft from '@material-ui/icons/ChevronLeft';
+import ChevronRight from '@material-ui/icons/ChevronRight';
+import Clear from '@material-ui/icons/Clear';
+import DeleteOutline from '@material-ui/icons/DeleteOutline';
+import Edit from '@material-ui/icons/Edit';
+import FilterList from '@material-ui/icons/FilterList';
+import FirstPage from '@material-ui/icons/FirstPage';
+import LastPage from '@material-ui/icons/LastPage';
+import Remove from '@material-ui/icons/Remove';
+import SaveAlt from '@material-ui/icons/SaveAlt';
+import Search from '@material-ui/icons/Search';
+import ViewColumn from '@material-ui/icons/ViewColumn';
 
 import firebase from 'firebase';
-// import {ScriptSnapshot} from 'typescript';
 
-// import 'firebase/firestore';
+const tableIcons = {
+  Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
+  Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
+  Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
+  DetailPanel: forwardRef((props, ref) => (
+    <ChevronRight {...props} ref={ref} />
+  )),
+  Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
+  Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
+  Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
+  FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
+  LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
+  NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
+  PreviousPage: forwardRef((props, ref) => (
+    <ChevronLeft {...props} ref={ref} />
+  )),
+  ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
+  Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
+  SortArrow: forwardRef((props, ref) => <ArrowDownward {...props} ref={ref} />),
+  ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
+  ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
+};
 
 export default class AnswerTable extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      round: null,
-      locked: null,
-      teamAnswersNotes: null,
-      rows: [],
-    };
-  }
-
-  componentDidMount() {
-    // console.log('componentDidMount', this.props.round);
-    this.getSnapshot(this.props.round, this.props.locked);
-  }
-  componentDidUpdate(prevProps, prevState) {
-    // console.log('componentDidUpdate', this.props.round, prevProps, this.state);
-    if (this.props.round !== prevProps.round) {
-      this.getSnapshot(this.props.round, this.props.locked);
+    this.state={
+     round: this.props.round + 1,
+     rows: null,
+     answers: null,
+     name: '',
     }
   }
+  componentDidMount(){
+    console.log(this.props)
+    this.getSnapshot()
+  }
 
-  async getSnapshot(roundNum, locked) {
-    const round = 'R' + (roundNum + 1).toString();
-    firebase
+  async getSnapshot() {
+    const snapshot = await firebase
       .database()
-      .ref('/teams/' + 'Team1' + '/rounds/' + round + '/teamAnswersNotes')
-      .on('value', (snapshot) => {
-        // console.log('getSnapshot', snapshot.val());
-        const teamAnswersNotes = snapshot.val();
-        this.setState({
-          round: roundNum,
-          teamAnswersNotes,
-          locked,
-        });
-      });
-  }
-
-  handleAnswerOnChange(e, QNumber) {
-    // console.log('handleAnswerOnChange', QNumber, e.target.value);
-    const value = e.target.value;
-    const QNum = 'Q' + QNumber.toString();
-    const answerNotes = this.state.teamAnswersNotes[QNum];
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/teamAnswersNotes/${QNum}`;
-    firebase.database().ref(refPath).set({
-      teamAnswer: value,
-      teamNote: answerNotes['teamNote'],
+      .ref(`/answers/${this.state.round}`)
+      // .ref(`/teams/${this.teamId}`)
+      .once('value');
+    const roundAnswerData = snapshot.val();
+    console.log('getSnapshot', roundAnswerData, roundAnswerData['name']);
+    this.setState({
+      name: roundAnswerData['name'],
+      answers: roundAnswerData['answers'],
     });
+    this.makeRows(roundAnswerData['answers'])
   }
-
-  handleNoteOnChange(e, QNumber) {
-    // console.log('handleNoteOnChange', QNumber, e.target.value);
-    const value = e.target.value;
-    const QNum = 'Q' + QNumber.toString();
-    const answerNotes = this.state.teamAnswersNotes[QNum];
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/teamAnswersNotes/${QNum}`;
-    firebase.database().ref(refPath).set({
-      teamAnswer: answerNotes['teamAnswer'],
-      teamNote: value,
-    });
-  }
-
-  makeRows() {
-    const teamAnswersNotes = this.state.teamAnswersNotes;
+  columnsHost = [
+    {field: 'number', title: 'Q #', width: '90px'},
+    {field: 'answer', title: 'Correct A'},
+  ];
+  makeRows(roundAnswers){
     let rows = [];
-    for (const key in teamAnswersNotes) {
-      if (teamAnswersNotes.hasOwnProperty(key)) {
-        const element = teamAnswersNotes[key];
+    for (const key in roundAnswers) {
+      if (roundAnswers.hasOwnProperty(key)) {
+        const element = roundAnswers[key];
         rows.push({
-          number: key.slice(1), //get rid of Q
-          teamAnswer: element['teamAnswer'],
-          teamNote: element['teamNote'],
-        });
+          number: key,
+          answer: element,
+        })
       }
     }
-    return rows;
+    this.setState({ rows })
   }
-
-  handleOnLock() {
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/locked`;
-    // firebase
-    //   .database()
-    //   .ref(refPath)
-    //   .on('value', (snapshot) => {
-    //     console.log('handleOnLock', snapshot.val());
-    //   });
-    // firebase.database().ref(refPath).set({
-    //   teamAnswer: answerNotes['teamAnswer'],
-    //   teamNote: value,
-    // });
-    this.setState({locked: true});
-  }
-
+  // rows = [
+  //   {
+  //     number: '1',
+  //     answer: 'Remote Control',
+  //     key: 1,
+  //   },
+  //   {
+  //     number: '2',
+  //     answer: 'Remote Control',
+  //     key: 2,
+  //   },
+  // ];
   render() {
-    // console.log('render1', this.props, this.state, this.rows);
-    if (this.state.round === null) return null;
-    let rows = this.makeRows(this.props.round);
+    if(this.state.rows === null ) return null;
+    const rows = this.state.rows;
+    console.log(rows)
     return (
       <>
-        <TableContainer component={Paper}>
-          <Table aria-label="answer table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Q #</TableCell>
-                <TableCell>Answer</TableCell>
-                <TableCell>Notes</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.number}>
-                  <TableCell component="th" scope="row">
-                    {row.number}
-                  </TableCell>
-                  <TableCell align="left">
-                    <Input
-                      disabled={this.state.locked}
-                      type="string"
-                      value={row.teamAnswer}
-                      onChange={(e) => this.handleAnswerOnChange(e, row.number)}
-                    />
-                  </TableCell>
-                  <TableCell align="left">
-                    <Input
-                      type="string"
-                      value={row.teamNote}
-                      onChange={(e) => this.handleNoteOnChange(e, row.number)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Card>
-          <h1 style={{color: 'red'}}>Lock your answer!</h1>
-          <p>Once you lock it, I cannot undo it for you.</p>
-          <Switch
-            checked={this.state.locked}
-            onChange={() => this.handleOnLock()}
-            name="checkedA"
-            inputProps={{'aria-label': 'secondary checkbox'}}
-          />
-        </Card>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <MaterialTable
+              title={
+                <>
+                  Name: <TextField />
+                </>
+              }
+              columns={this.columnsHost}
+              data={rows}
+              icons={tableIcons}
+              options={{
+                search: false,
+              }}
+              editable={{
+                onRowAdd: (newData, oldData) =>
+                  new Promise((resolve) => {
+                    resolve();
+                    console.log(newData)
+                  }),
+                onRowUpdate: (newData, oldData) =>
+                  new Promise((resolve) => {
+                    resolve();
+                    console.log(newData)
+                  }),
+                onRowDelete: (newData, oldData) =>
+                  new Promise((resolve) => {
+                    resolve();
+                    console.log(newData)
+                  }),
+              }}
+            />
+          </Grid>
+        </Grid>
       </>
     );
   }

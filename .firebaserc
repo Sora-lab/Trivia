@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "ross-trivia"
+  },
+  "targets": {
+    "ross-trivia": {
+      "hosting": {
+        "rosstrivia": [
+          "ross-trivia"
+        ]
+      }
+    }
   }
 }

@@ -113,54 +113,7 @@ export default class TabConent extends Component{
   render() {
     return (
       <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <MaterialTable
-              title={this.props.round}
-              columns={this.columnsHost}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              editable={{
-                onRowAdd: (newData) =>
-                  new Promise((resolve) => {
-                    setTimeout(() => {
-                      resolve();
-                      this.setState((prevState) => {
-                        const data = [...prevState.data];
-                        data.push(newData);
-                        return {...prevState, data};
-                      });
-                    }, 600);
-                  }),
-                onRowUpdate: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    setTimeout(() => {
-                      resolve();
-                      if (oldData) {
-                        this.setState((prevState) => {
-                          const data = [...prevState.data];
-                          data[data.indexOf(oldData)] = newData;
-                          return {...prevState, data};
-                        });
-                      }
-                    }, 600);
-                  }),
-                onRowDelete: (oldData) =>
-                  new Promise((resolve) => {
-                    setTimeout(() => {
-                      resolve();
-                      this.setState((prevState) => {
-                        const data = [...prevState.data];
-                        data.splice(data.indexOf(oldData), 1);
-                        return {...prevState, data};
-                      });
-                    }, 600);
-                  }),
-              }}
-            />
-          </Grid>
+          
           <Grid item xs={4}>
             <MaterialTable
               key={1}
