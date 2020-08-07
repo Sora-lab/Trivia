@@ -10,19 +10,20 @@ import TeamAnswerEntryTable from '../component/TeamAnswerEntryTable';
 export default class TeamPage extends Component {
   constructor(props) {
     super(props);
-    this.teamId = props.match.params.teamId
+    this.teamId = props.match.params.teamId;
     this.state = {
       selectedTab: 0,
-      teamNum: null,
       teamName: null,
-      roundLocked: {},
+      rows: {},
+      titles:[],
     };
   }
-  
+
   database = firebase.database();
-  
+
   componentDidMount() {
     this.getSnapshot();
+    this.getAnswerSnapShot();
   }
 
   componentDidUpdate() {}
@@ -30,40 +31,57 @@ export default class TeamPage extends Component {
   async getSnapshot() {
     const snapshot = await firebase
       .database()
-      .ref(`/teams/Team${this.teamId}`)
-      // .ref(`/teams/${this.teamId}`)
+      .ref(`/teams/${this.teamId}`)
       .once('value');
     const teamData = snapshot.val();
-    const rounds = teamData.rounds;
-    console.log('getSnapshot', rounds);
-    let lockedRound = {};
-    for (const key in rounds) {
-      if (rounds.hasOwnProperty(key)) {
-        const element = rounds[key];
-        lockedRound[key] = element['locked'];
-      }
-    }
     this.setState({
-      teamName: teamData.teamName,
-      teamNum: teamData.teamNum,
-      roundLocked: lockedRound,
+      teamName: teamData?.teamName || null,
+      teamId: this.teamId,
+    });
+  }
+
+  async getAnswerSnapShot() {
+    const snapshot = await firebase.database().ref(`/answers/`).once('value');
+    const answerSnapshot = snapshot.val();
+    let roundRows = {};
+    let titles = [];
+    answerSnapshot.forEach((element, index) => {
+      let rows = [];
+      titles.push(element['roundTitle']);
+      const answers = element['roundAnswers'];
+      console.log(answers);
+      for (const key in answers) {
+        let element = answers[key];
+        rows.push({number: key, key: parseInt(element['sortOrder'])});
+        roundRows[index] = rows;
+      }
+      console.log(rows)
+      rows.sort((a,b)=>a.key - b.key)
+      console.log(rows)
+    });
+    this.setState({
+      roundRows,
+      titles,
     });
   }
 
   handleTabChange(event, newValue) {
-    // console.log(event, newValue);
     this.setState({selectedTab: newValue});
   }
 
   render() {
-    let roundLocked = this.state.roundLocked;
-    let round = 'R' + this.state.selectedTab;
-    // let locked = roundLocked[round];
+    let round = parseInt(this.state.selectedTab) + 1;
+    const rows = this.state.roundRows;
+    const teamId = this.state.teamId;
+    const titles = this.state.titles;
+    const selectedTab = this.state.selectedTab;
+    // console.log(round, rows, teamId)
     return (
       <div style={{margin: '32px', padding: '32px'}}>
         <h2>{this.state.teamName}</h2>
+        <h3>{titles[selectedTab]} Round</h3>
         <Tabs
-          value={this.state.selectedTab}
+          value={selectedTab}
           onChange={(event, newValue) => this.handleTabChange(event, newValue)}
           aria-label="trivia rounds"
           style={{margin: '32px'}}
@@ -77,10 +95,7 @@ export default class TeamPage extends Component {
           <Tab label="Round 7" value={6} />
           <Tab label="Round 8" value={7} />
         </Tabs>
-        <TeamAnswerEntryTable
-          locked={roundLocked[round]}
-          round={this.state.selectedTab}
-        />
+        <TeamAnswerEntryTable round={round} rows={rows} teamId={teamId} />
       </div>
     );
   }

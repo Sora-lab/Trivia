@@ -20,7 +20,6 @@ import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
 
-
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
   Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
@@ -45,7 +44,7 @@ const tableIcons = {
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />),
 };
 
-export default class TabConent extends Component{
+export default class TabConent extends Component {
   columnsHost = [
     {field: 'round', title: 'Round', width: '5%'},
     {field: 'number', title: 'Q #', width: '90px'},
@@ -113,203 +112,166 @@ export default class TabConent extends Component{
   render() {
     return (
       <Grid container spacing={2}>
-          
-          <Grid item xs={4}>
-            <MaterialTable
-              key={1}
-              title="Team name something"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    resolve();
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={2}
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={3}
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={4}
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={5}
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={5}
-              title="Team name"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={6}
-              title="Editable Example"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <MaterialTable
-              key={7}
-              title="Editable Example"
-              columns={this.columns}
-              data={this.rows}
-              icons={tableIcons}
-              options={{
-                search: false,
-              }}
-              cellEditable={{
-                cellStyle: {},
-                onCellEditApproved: (
-                  newValue,
-                  oldValue,
-                  rowData,
-                  columnDef
-                ) => {
-                  return new Promise((resolve, reject) => {
-                    console.log('newValue: ' + newValue);
-                    setTimeout(resolve, 4000);
-                  });
-                },
-              }}
-            />
-          </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={1}
+            title="Team name something"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  resolve();
+                });
+              },
+            }}
+          />
         </Grid>
-
-    )
+        <Grid item xs={4}>
+          <MaterialTable
+            key={2}
+            title="Team name"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={3}
+            title="Team name"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={4}
+            title="Team name"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={5}
+            title="Team name"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={5}
+            title="Team name"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={6}
+            title="Editable Example"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <MaterialTable
+            key={7}
+            title="Editable Example"
+            columns={this.columns}
+            data={this.rows}
+            icons={tableIcons}
+            options={{
+              search: false,
+            }}
+            cellEditable={{
+              cellStyle: {},
+              onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
+                return new Promise((resolve, reject) => {
+                  console.log('newValue: ' + newValue);
+                  setTimeout(resolve, 4000);
+                });
+              },
+            }}
+          />
+        </Grid>
+      </Grid>
+    );
   }
 }

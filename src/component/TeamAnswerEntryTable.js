@@ -11,110 +11,112 @@ import Paper from '@material-ui/core/Paper';
 import Input from '@material-ui/core/Input';
 
 import firebase from 'firebase';
-// import {ScriptSnapshot} from 'typescript';
-
-// import 'firebase/firestore';
 
 export default class TeamAnswerEntryTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      round: null,
-      locked: null,
+      round: this.props.round,
+      roundLocked: null,
       teamAnswersNotes: null,
       rows: [],
+      teamId: this.props.teamId,
     };
   }
 
   componentDidMount() {
-    // console.log('componentDidMount', this.props.round);
-    this.getSnapshot(this.props.round, this.props.locked);
+    // console.log('componentDidMount answer entry table', this.props);
   }
+
   componentDidUpdate(prevProps, prevState) {
-    // console.log('componentDidUpdate', this.props.round, prevProps, this.state);
-    if (this.props.round !== prevProps.round) {
-      this.getSnapshot(this.props.round, this.props.locked);
-    }
-  }
-
-  async getSnapshot(roundNum, locked) {
-    const round = 'R' + (roundNum + 1).toString();
-    firebase
-      .database()
-      .ref('/teams/' + 'Team1' + '/rounds/' + round + '/teamAnswersNotes')
-      .on('value', (snapshot) => {
-        // console.log('getSnapshot', snapshot.val());
-        const teamAnswersNotes = snapshot.val();
-        this.setState({
-          round: roundNum,
-          teamAnswersNotes,
-          locked,
-        });
-      });
-  }
-
-  handleAnswerOnChange(e, QNumber) {
-    // console.log('handleAnswerOnChange', QNumber, e.target.value);
-    const value = e.target.value;
-    const QNum = 'Q' + QNumber.toString();
-    const answerNotes = this.state.teamAnswersNotes[QNum];
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/teamAnswersNotes/${QNum}`;
-    firebase.database().ref(refPath).set({
-      teamAnswer: value,
-      teamNote: answerNotes['teamNote'],
+    // console.log(
+    //   'componentDidUpdate',
+    //   this.props,
+    //   prevProps,
+    //   'state',
+    //   this.state
+    // );
+    if (this.props === prevProps) return;
+    this.setState({
+      rows: [],
     });
+    this.getSnapshot(this.props);
   }
 
-  handleNoteOnChange(e, QNumber) {
-    // console.log('handleNoteOnChange', QNumber, e.target.value);
-    const value = e.target.value;
-    const QNum = 'Q' + QNumber.toString();
-    const answerNotes = this.state.teamAnswersNotes[QNum];
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/teamAnswersNotes/${QNum}`;
-    firebase.database().ref(refPath).set({
-      teamAnswer: answerNotes['teamAnswer'],
-      teamNote: value,
-    });
-  }
-
-  makeRows() {
-    const teamAnswersNotes = this.state.teamAnswersNotes;
-    let rows = [];
-    for (const key in teamAnswersNotes) {
-      if (teamAnswersNotes.hasOwnProperty(key)) {
-        const element = teamAnswersNotes[key];
-        rows.push({
-          number: key.slice(1), //get rid of Q
-          teamAnswer: element['teamAnswer'],
-          teamNote: element['teamNote'],
-        });
+  async getSnapshot(props) {
+    const roundNum = props.round;
+    // console.log('getSnapshot', roundNum, this.state, props);
+    const refPath = `/teams/${props.teamId}/rounds/${roundNum}`;
+    const teamRoundInfo = await firebase.database().ref(refPath);
+    teamRoundInfo.on('value', (snapshot) => {
+      const teamRoundVal = snapshot.val();
+      const answersNotes = teamRoundVal?.teamAnswersNotes;
+      const roundLocked = teamRoundVal?.roundLocked;
+      console.log(props.rows, roundNum, teamRoundVal, answersNotes, roundLocked)
+      if (props.rows && props.rows[roundNum]) {
+        const correctAnswerRows = props.rows[roundNum];
+        if (answersNotes === null || answersNotes === undefined) {
+          this.setState({
+            round: roundNum,
+            rows: correctAnswerRows,
+            teamId: props.teamId,
+            roundLocked: roundLocked,
+          });
+        } else {
+          let newRows = [];
+          correctAnswerRows.forEach((row) => {
+            const qNum = row.number;
+            let rowdata = {
+              number: qNum,
+            };
+            // console.log(answersNotes, qNum, answersNotes[qNum], answersNotes.qNum)
+            if (answersNotes && answersNotes[qNum]) {
+              rowdata['teamAnswer'] = answersNotes[qNum].teamAnswer;
+              rowdata['teamNote'] = answersNotes[qNum].teamNote;
+            }
+            newRows.push(rowdata);
+          });
+          this.setState({
+            round: roundNum,
+            rows: newRows,
+            teamId: props.teamId,
+            roundLocked: roundLocked,
+          });
+        }
       }
-    }
-    return rows;
+    });
   }
+
+  handleOnChange(e, QNumber, field) {
+    // console.log(this.state);
+    // console.log('handleAnswerOnChange', QNumber, e.target.value);
+    const round = this.state.round;
+    const value = e.target.value;
+    // const answerNotes = this.state.teamAnswersNotes[QNumber];
+    const newValue = {};
+    newValue[field] = value;
+    const refPath = `/teams/${this.state.teamId}/rounds/${round}/teamAnswersNotes/${QNumber}`;
+    firebase.database().ref(refPath).update(newValue);
+  }
+
 
   handleOnLock() {
-    const round = 'R' + (this.state.round + 1).toString();
-    const refPath = `/teams/Team1/rounds/${round}/locked`;
-    // firebase
-    //   .database()
-    //   .ref(refPath)
-    //   .on('value', (snapshot) => {
-    //     console.log('handleOnLock', snapshot.val());
-    //   });
-    // firebase.database().ref(refPath).set({
-    //   teamAnswer: answerNotes['teamAnswer'],
-    //   teamNote: value,
-    // });
-    this.setState({locked: true});
+    const round = this.state.round;
+    const refPath = `/teams/${this.state.teamId}/rounds/${round}/`;
+    firebase.database().ref(refPath).update({
+      roundLocked: true,
+    });
   }
 
   render() {
     // console.log('render1', this.props, this.state, this.rows);
-    if (this.state.round === null) return null;
-    let rows = this.makeRows(this.props.round);
+    // if (this.state.round === null) return null;
+    // let rows = this.makeRows(this.props.round);
+    // const rows = [{number: 'Q1'}, {number: 'Q1a'}];
+    const rows = this.state.rows;
+    const locked = this.state.roundLocked;
+    // console.log('render', rows, locked);
+
     return (
       <>
         <TableContainer component={Paper}>
@@ -137,14 +139,18 @@ export default class TeamAnswerEntryTable extends Component {
                       disabled={this.state.locked}
                       type="string"
                       value={row.teamAnswer}
-                      onChange={(e) => this.handleAnswerOnChange(e, row.number)}
+                      onChange={(e) =>
+                        this.handleOnChange(e, row.number, 'teamAnswer')
+                      }
                     />
                   </TableCell>
                   <TableCell align="left">
                     <Input
                       type="string"
                       value={row.teamNote}
-                      onChange={(e) => this.handleNoteOnChange(e, row.number)}
+                      onChange={(e) =>
+                        this.handleOnChange(e, row.number, 'teamNote')
+                      }
                     />
                   </TableCell>
                 </TableRow>
@@ -154,12 +160,12 @@ export default class TeamAnswerEntryTable extends Component {
         </TableContainer>
         <Card>
           <h1 style={{color: 'red'}}>Lock your answer!</h1>
-          <p>Once you lock it, I cannot undo it for you.</p>
           <Switch
-            checked={this.state.locked}
+            checked={locked}
+            disabled={locked}
             onChange={() => this.handleOnLock()}
-            name="checkedA"
-            inputProps={{'aria-label': 'secondary checkbox'}}
+            name="lock"
+            inputProps={{'aria-label': 'primary checkbox'}}
           />
         </Card>
       </>

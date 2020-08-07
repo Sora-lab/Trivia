@@ -8,7 +8,6 @@ import HomePage from './pages/HomePage';
 import AnswerPage from './pages/AnswerPage';
 
 function App() {
- 
   return (
     <Router>
       <div className="App">

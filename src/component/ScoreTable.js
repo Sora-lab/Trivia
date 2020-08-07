@@ -51,7 +51,6 @@ export default class ScoreTable extends Component {
     };
   }
 
-
   columns = [
     {
       field: 'qNumber',

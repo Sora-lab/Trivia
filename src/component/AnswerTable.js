@@ -50,65 +50,113 @@ const tableIcons = {
 export default class AnswerTable extends Component {
   constructor(props) {
     super(props);
-    this.state={
-     round: this.props.round + 1,
-     rows: null,
-     answers: null,
-     name: '',
-    }
+    this.state = {
+      round: parseInt(this.props.round) + 1,
+      rows: [],
+      answers: null,
+      title: '',
+    };
   }
-  componentDidMount(){
-    console.log(this.props)
-    this.getSnapshot()
+  componentDidMount() {
+    // console.log('answerTable componentDidMount', this.props);
+    this.getSnapshot();
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // console.log(
+    //   'answerTable componentDidUpdate',
+    //   this.props.round,
+    //   prevProps.round,
+
+    // );
+    if (this.props === prevProps) return;
+    this.getSnapshot();
   }
 
-  async getSnapshot() {
-    const snapshot = await firebase
-      .database()
-      .ref(`/answers/${this.state.round}`)
-      // .ref(`/teams/${this.teamId}`)
-      .once('value');
-    const roundAnswerData = snapshot.val();
-    console.log('getSnapshot', roundAnswerData, roundAnswerData['name']);
-    this.setState({
-      name: roundAnswerData['name'],
-      answers: roundAnswerData['answers'],
-    });
-    this.makeRows(roundAnswerData['answers'])
-  }
   columnsHost = [
+    {field: 'key', type: 'numeric', title: 'Sort order', width: '90px'},
     {field: 'number', title: 'Q #', width: '90px'},
-    {field: 'answer', title: 'Correct A'},
+    {field: 'answer', title: 'Correct answer'},
   ];
-  makeRows(roundAnswers){
-    let rows = [];
-    for (const key in roundAnswers) {
-      if (roundAnswers.hasOwnProperty(key)) {
-        const element = roundAnswers[key];
-        rows.push({
-          number: key,
-          answer: element,
-        })
-      }
-    }
-    this.setState({ rows })
+
+  async getSnapshot() {
+    // console.log('answerTable getSnapshot', this.props.round);
+    const round = parseInt(this.props.round) + 1;
+    // console.log(round)
+    const roundData = firebase.database().ref(`/answers/${round}`);
+    roundData.on('value', (snapshot) => {
+      this.makeRowsSetTitle(snapshot.val(), round);
+    });
   }
-  // rows = [
-  //   {
-  //     number: '1',
-  //     answer: 'Remote Control',
-  //     key: 1,
-  //   },
-  //   {
-  //     number: '2',
-  //     answer: 'Remote Control',
-  //     key: 2,
-  //   },
-  // ];
+
+  async makeRowsSetTitle(roundData, round) {
+    // console.log('answerTable makeRowsSetTitle', this.props, roundData);
+    if (roundData === null || roundData === undefined) {
+      this.setState({title: '', rows: [], round: round});
+    } else {
+      const roundAnswers = roundData['roundAnswers'];
+      let rows = [];
+      for (const key in roundAnswers) {
+        if (roundAnswers.hasOwnProperty(key)) {
+          const element = roundAnswers[key];
+          rows.push({
+            number: key,
+            key: parseInt(element['sortOrder']),
+            answer: element['answer'],
+          });
+        }
+      }
+      rows.sort((a, b)=>a.key -b.key)
+      this.setState({title: roundData['roundTitle'], rows, round});
+    }
+  }
+
+  titleOnChange(e) {
+    const round = this.state.round;
+    // console.log(round)
+    const refPath = `/answers/${round}`;
+    this.setState({title: e.target.value});
+    firebase.database().ref(refPath).update({
+      roundTitle: e.target.value,
+    });
+  }
+
+  // handleOnRowAdd(newData) {
+  //   console.log('handleonRowAdd', newData, typeof newData.number);
+  //   const round = this.state.round;
+  //   const QNumber = `${newData.number.trim()}`; // realtime database doesn't take decimal
+  //   // console.log(round, QNumber)
+  //   const QAnswer = newData.answer;
+  //   const refPath = `/answers/${round}/roundAnswers/${QNumber}`;
+  //   firebase.database().ref(refPath).update({
+  //     answer: QAnswer,
+  //   });
+  // }
+
+  handleOnRowUpdate(newData) {
+    // console.log('handleOnRowUpdate', newData);
+    const round = this.state.round;
+    const QNumber = `${newData.number.trim()}`; // realtime database doesn't take decimal
+    const QAnswer = newData.answer;
+    const sortOrder = newData.key;
+    const refPath = `/answers/${round}/roundAnswers/${QNumber}`;
+    firebase.database().ref(refPath).update({
+      sortOrder: parseInt(sortOrder),
+      answer: QAnswer,
+    });
+  }
+
+  handleOnRowDelete(newData, oldData) {
+    // console.log('handleOnRowDelete', newData);
+    const round = this.state.round;
+    const QNumber = `${newData.number.trim()}`;
+    const refPath = `/answers/${round}/roundAnswers/${QNumber}`;
+    firebase.database().ref(refPath).remove();
+  }
+
   render() {
-    if(this.state.rows === null ) return null;
     const rows = this.state.rows;
-    console.log(rows)
+    const title = this.state.title;
+    // console.log('AnswerTable render', title, rows);
     return (
       <>
         <Grid container spacing={2}>
@@ -116,7 +164,17 @@ export default class AnswerTable extends Component {
             <MaterialTable
               title={
                 <>
-                  Name: <TextField />
+                  <TextField
+                    style={{margin: '2em'}}
+                    value={title}
+                    label="Round Title"
+                    variant="outlined"
+                    onChange={(e) => this.titleOnChange(e)}
+                  />
+                  <p>
+                    * Q# doesn't take decimal point. <br /> use 1a or 1_1 for
+                    bunus questions
+                  </p>
                 </>
               }
               columns={this.columnsHost}
@@ -129,17 +187,17 @@ export default class AnswerTable extends Component {
                 onRowAdd: (newData, oldData) =>
                   new Promise((resolve) => {
                     resolve();
-                    console.log(newData)
+                    this.handleOnRowUpdate(newData);
                   }),
                 onRowUpdate: (newData, oldData) =>
                   new Promise((resolve) => {
                     resolve();
-                    console.log(newData)
+                    this.handleOnRowUpdate(newData);
                   }),
                 onRowDelete: (newData, oldData) =>
                   new Promise((resolve) => {
                     resolve();
-                    console.log(newData)
+                    this.handleOnRowDelete(newData, oldData);
                   }),
               }}
             />
