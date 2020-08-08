@@ -50,6 +50,7 @@ export default class TeamAnswerEntryTable extends Component {
     const teamRoundInfo = await firebase.database().ref(refPath);
     teamRoundInfo.on('value', (snapshot) => {
       const teamRoundVal = snapshot.val();
+      // console.log(teamRoundVal)
       const answersNotes = teamRoundVal?.teamAnswersNotes;
       const roundLocked = teamRoundVal?.roundLocked;
       // console.log(
@@ -114,13 +115,8 @@ export default class TeamAnswerEntryTable extends Component {
   }
 
   render() {
-    // console.log('render1', this.props, this.state, this.rows);
-    // if (this.state.round === null) return null;
-    // let rows = this.makeRows(this.props.round);
-    // const rows = [{number: 'Q1'}, {number: 'Q1a'}];
     const rows = this.state.rows;
     const locked = this.state.roundLocked;
-    // console.log('render', rows, locked);
 
     return (
       <>
@@ -142,7 +138,7 @@ export default class TeamAnswerEntryTable extends Component {
                   <TableCell align="left">
                     <Input
                       style={{width: '100%'}}
-                      disabled={this.state.locked}
+                      disabled={locked}
                       type="string"
                       value={row.teamAnswer}
                       onChange={(e) =>

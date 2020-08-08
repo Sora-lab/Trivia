@@ -32,7 +32,7 @@ export default class HomePage extends Component {
         style={{background: '#c2d1e8', padding: '2em'}}
       >
         <header style={{padding: '2em', fontFamily: "'Rock Salt', cursive"}}>
-          <h2>Welcome to Ringermaster of Shit Show</h2>
+          <h2>Welcome to Ringermaster of the Shit Show</h2>
         </header>
         <Grid container spacing={2}>
           <Grid item xs>

@@ -157,6 +157,23 @@ export default class AnswerTable extends Component {
     const rows = this.state.rows;
     const title = this.state.title;
     // console.log('AnswerTable render', title, rows);
+    const editable = {
+      onRowAdd: (newData, oldData) =>
+        new Promise((resolve) => {
+          resolve();
+          this.handleOnRowUpdate(newData);
+        }),
+      onRowUpdate: (newData, oldData) =>
+        new Promise((resolve) => {
+          resolve();
+          this.handleOnRowUpdate(newData);
+        }),
+      onRowDelete: (newData, oldData) =>
+        new Promise((resolve) => {
+          resolve();
+          this.handleOnRowDelete(newData, oldData);
+        }),
+    }
     return (
       <>
         <Grid container spacing={2}>
@@ -183,23 +200,7 @@ export default class AnswerTable extends Component {
               options={{
                 search: false,
               }}
-              editable={{
-                onRowAdd: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    resolve();
-                    this.handleOnRowUpdate(newData);
-                  }),
-                onRowUpdate: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    resolve();
-                    this.handleOnRowUpdate(newData);
-                  }),
-                onRowDelete: (newData, oldData) =>
-                  new Promise((resolve) => {
-                    resolve();
-                    this.handleOnRowDelete(newData, oldData);
-                  }),
-              }}
+              editable={editable}
             />
           </Grid>
         </Grid>
