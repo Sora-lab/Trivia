@@ -117,7 +117,7 @@ export default class TeamAnswerEntryTable extends Component {
   render() {
     const rows = this.state.rows;
     const locked = this.state.roundLocked;
-
+    const lockText = locked ? 'Locked!' : 'Lock your answer!'
     return (
       <>
         <TableContainer component={Paper}>
@@ -162,7 +162,7 @@ export default class TeamAnswerEntryTable extends Component {
           </Table>
         </TableContainer>
         <Card>
-          <h1 style={{color: 'red'}}>Lock your answer!</h1>
+          <h1 style={{color: 'red'}}>{lockText}</h1>
           <Switch
             checked={locked}
             disabled={locked}
