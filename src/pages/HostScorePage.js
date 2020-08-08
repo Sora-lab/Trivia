@@ -7,8 +7,6 @@ import ScoreTabConent from '../component/ScoreTabConent';
 
 import firebase from 'firebase';
 
-import answerSnapshot from '../fetch/AnswerSnapshot';
-
 export default class HostScorePage extends Component {
   constructor(props) {
     super(props);
