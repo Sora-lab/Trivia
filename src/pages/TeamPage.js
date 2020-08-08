@@ -15,7 +15,7 @@ export default class TeamPage extends Component {
       selectedTab: 0,
       teamName: null,
       rows: {},
-      titles:[],
+      titles: [],
     };
   }
 
@@ -49,15 +49,15 @@ export default class TeamPage extends Component {
       let rows = [];
       titles.push(element['roundTitle']);
       const answers = element['roundAnswers'];
-      console.log(answers);
+      // console.log(answers);
       for (const key in answers) {
         let element = answers[key];
         rows.push({number: key, key: parseInt(element['sortOrder'])});
         roundRows[index] = rows;
       }
-      console.log(rows)
-      rows.sort((a,b)=>a.key - b.key)
-      console.log(rows)
+      // console.log(rows)
+      rows.sort((a, b) => a.key - b.key);
+      // console.log(rows)
     });
     this.setState({
       roundRows,

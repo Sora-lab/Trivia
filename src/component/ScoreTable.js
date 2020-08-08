@@ -1,4 +1,7 @@
 import React, {Component} from 'react';
+
+import firebase from 'firebase';
+
 import {forwardRef} from 'react';
 
 import MaterialTable from 'material-table';
@@ -18,6 +21,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import {title} from 'process';
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -47,20 +51,114 @@ export default class ScoreTable extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      rows: this.props.data,
+      title: null,
+      round: null,
+      answerRows: null,
+      teamName: null,
+      teamId: null,
+      rows: null,
+      locked: null,
+      points: null,
     };
+  }
+
+  componentDidMount() {
+    // console.log('scoreTable mount', this.props.teamId);
+    if (this.props.answerRows !== undefined) {
+      const title = this.props.title;
+      const round = this.props.round;
+      const answerRows = this.props.answerRows;
+      const teams = this.props.teams;
+      const teamId = this.props.teamId;
+      const teamName = teams.get(teamId);
+      this.setState({
+        title: title,
+        round: round,
+        answerRows: answerRows,
+        teams: teams,
+        teamId: teamId,
+        teamName: teamName,
+      });
+      this.getTeamSnapshot(answerRows, round, teamId, 'componene didmout');
+    }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    // console.log('scoreTable update this', this.props);
+    // console.log('scoreTable update prev', prevProps);
+    // console.log('scoreTable update this state', this.state);
+    // console.log('scoreTable update prev state', prevState);
+    if (this.state === this.prevState) return;
+    if (this.props !== prevProps) {
+      const title = this.props.title;
+      const round = this.props.round;
+      const answerRows = this.props.answerRows;
+      const teams = this.props.teams;
+      const teamId = this.props.teamId;
+      const teamName = teams.get(teamId);
+      this.setState({
+        title: title,
+        round: round,
+        answerRows: answerRows,
+        teams: teams,
+        teamId: teamId,
+        teamName: teamName,
+      });
+      this.getTeamSnapshot(answerRows, round, teamId, 'componentDidUpdate');
+    }
+  }
+
+  async getTeamSnapshot(answerRows, round, teamId, calledFrom) {
+    // console.log('getTeamSnapshot', teamId, calledFrom);
+    const refPath = `/teams/${teamId}/rounds/${round}`;
+    const teamData = await firebase.database().ref(refPath);
+    // console.log(teamId, refPath, teamData)
+    teamData.on('value', (snapshot) => {
+      const teamDataVal = snapshot.val();
+      // if (teamDataVal !== null) {
+        const locked = teamDataVal?.roundLocked ? teamDataVal.roundLocked : false;
+        // console.log(teamDataVal,  teamId);
+        // const points = teamDataVal.totalPoints;
+        const teamAnswersNotes = teamDataVal?.teamAnswersNotes;
+        const rows = this.makeRows(answerRows, teamAnswersNotes, teamId);
+        this.setState({rows, locked});
+      // }
+    });
+  }
+
+  makeRows(answerRows, answersNotes, teamId) {
+    // console.log('makeRows', 'answerRows, answersNotes', teamId)
+    let newRows = [];
+    let totalPoints = 0;
+    answerRows.forEach((row) => {
+      const qNum = row.number;
+      const answerNote = answersNotes && answersNotes[qNum];
+      // console.log(answersNotes)
+      newRows.push({
+        key: row.key,
+        qNumber: qNum,
+        answer: row.answer,
+        teamAnswer: answerNote?.teamAnswer,
+        teamNote: answerNote?.teamNote,
+        match: false,
+        points: answerNote?.points ? answerNote.points : 0,
+      });
+      totalPoints += 1;
+    });
+
+    return newRows;
   }
 
   columns = [
     {
       field: 'qNumber',
       title: 'Q #',
-      type: 'numeric',
-      width: '15%',
+      type: 'string',
+      width: '5%',
       cellStyle: {textAlign: 'left'},
       sorting: false,
       headerStyle: {textAlign: 'left'},
       editable: 'never',
+      align: 'right',
     },
     {
       field: 'answer',
@@ -69,8 +167,14 @@ export default class ScoreTable extends Component {
       editable: 'never',
     },
     {
-      field: 'teamInput',
-      title: 'Team A',
+      field: 'teamAnswer',
+      title: 'Team Answer',
+      sorting: false,
+      editable: 'never',
+    },
+    {
+      field: 'teamNote',
+      title: 'Team Note',
       sorting: false,
       editable: 'never',
     },
@@ -81,40 +185,45 @@ export default class ScoreTable extends Component {
       width: '5%',
       headerStyle: {textAlign: 'right'},
       editable: 'never',
+      align: 'left',
     },
     {
-      field: 'point',
-      title: 'Point',
-      type: 'boolean',
-      width: '5%',
+      field: 'points',
+      title: 'Points',
+      type: 'numeric',
+      width: '20%',
       editable: 'always',
-    },
-  ];
-  rows = [
-    {
-      round: 'Music',
-      qNumber: '1',
-      answer: 'Remote Control',
-      teamInput: 'remo mom',
-      match: 'true',
-      point: 'yes',
-    },
-    {
-      round: 'Music',
-      qNumber: '2',
-      answer: 'Remote Control',
-      teamInput: 'remo mom',
-      match: 'true',
-      point: 'yes',
+      align: 'left',
     },
   ];
 
+  pointsOnChange(value, rowData) {
+    const qNum = rowData.qNumber
+//     answer: "deer"
+// key: 2
+// match: false
+// points: 0
+// qNumber: "Q2"
+// tableData: {id: 1, editCellList: Array(0)}
+// teamAnswer: undefined
+// teamNote: undefined
+    const teamId = this.state.teamId;
+    const round = this.state.round;
+    const refPath = `/teams/${teamId}/rounds/${round}/teamAnswersNotes/${qNum}`;
+    const updates = {points: value};
+    firebase.database().ref(refPath).update(updates);
+  }
   render() {
+    // console.log('render');
+    const rows = this.state.rows || [];
+    const locked = this.state.locked;
+    // const points = this.state.points;
+    // console.log(locked, points,)
     return (
       <MaterialTable
-        title="Team name"
+        title={`${this.state.teamName}     Locked: ${locked}       Points: `}
         columns={this.columns}
-        data={this.rows}
+        data={rows}
         icons={tableIcons}
         options={{
           search: false,
@@ -123,7 +232,9 @@ export default class ScoreTable extends Component {
           cellStyle: {},
           onCellEditApproved: (newValue, oldValue, rowData, columnDef) => {
             return new Promise((resolve, reject) => {
-              console.log('newValue: ' + newValue);
+              resolve();
+              console.log('newValue: ' + newValue, rowData);
+              this.pointsOnChange(newValue, rowData);
             });
           },
         }}
