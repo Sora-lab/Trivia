@@ -173,11 +173,13 @@ export default class ScoreTable extends Component {
     // console.log(teamAnswerArrLowerCase)
     answerArr.forEach(answer => {
       // console.log(answer)
-      let foo = answer.toLowerCase();
-      console.log(teamAnswerArrLowerCase.includes(foo))
-      if(match === false && teamAnswerArrLowerCase.includes(answer)){
+      let re = new RegExp(answer)
+      let foo = answer.toLowerCase().trim();
+      // console.log(match, teamAnswerArrLowerCase.includes(foo))
+      if(match === false && teamAnswerArrLowerCase.includes(foo)){
         match = true;
       }
+      // console.log(match)
     });
     return match;
   }
