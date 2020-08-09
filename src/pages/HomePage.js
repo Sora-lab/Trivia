@@ -10,13 +10,18 @@ export default class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      teams: new Map(),
+      teamNames: null,
     };
   }
 
   componentDidMount() {
-    //
+    const refPath = `/teams`;
+    const teams = firebase.database().ref(refPath)
+    teams.on('value', (snapshot) => {
+      this.getTeamNames(snapshot.val());
+    });
   }
+  
   teamNameOnChange(teamId, e){
     const teamName = e.target.value
     const refPath = `/teams/${teamId}`;
@@ -24,7 +29,19 @@ export default class HomePage extends Component {
       teamName: teamName,
     });
   }
+
+  getTeamNames(teams){
+    let teamNames = new Map()
+    teams.forEach((team, index) => {
+      const teamName = team.teamName;
+      teamNames.set(index, teamName);
+    });
+    this.setState({teamNames})
+  }
+  
   render() {
+    const teamNames = this.state.teamNames;
+    if(teamNames === null || teamNames === undefined) return null;
     return (
       <div
         className="home-main"
@@ -39,10 +56,10 @@ export default class HomePage extends Component {
               <TextField
                 id={1}
                 label="Team 1"
-                defaultValue="The Rural Jurors"
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(1, e)}}
+                value={teamNames.get(1)}
               />
               <p>
                 {' '}
@@ -59,6 +76,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(2, e)}}
+                value={teamNames.get(2)}
               />
               <p>
                 {' '}
@@ -75,6 +93,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(3, e)}}
+                value={teamNames.get(3)}
               />
               <p>
                 {' '}
@@ -93,6 +112,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(4, e)}}
+                value={teamNames.get(4)}
               />
               <p>
                 {' '}
@@ -109,6 +129,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(5, e)}}
+                value={teamNames.get(5)}
               />
               <p>
                 {' '}
@@ -125,6 +146,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(6, e)}}
+                value={teamNames.get(6)}
               />
               <p>
                 {' '}
@@ -143,6 +165,7 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(7, e)}}
+                value={teamNames.get(7)}
               />
               <p>
                 {' '}
@@ -159,26 +182,11 @@ export default class HomePage extends Component {
                 variant="outlined"
                 style={{width: '100%'}}
                 onChange={(e)=>{this.teamNameOnChange(8, e)}}
+                value={teamNames.get(8)}
               />
               <p>
                 {' '}
                 <a href="/team/8">Enter here</a>
-              </p>
-            </Paper>
-          </Grid>
-          <Grid item xs>
-            <Paper style={{minHeight: '250px', padding: '2em'}}>
-              <TextField
-                id={9}
-                label="Team 9"
-                defaultValue=""
-                variant="outlined"
-                style={{width: '100%'}}
-                onChange={(e)=>{this.teamNameOnChange(9, e)}}
-              />
-              <p>
-                {' '}
-                <a href="/team/9">Enter here</a>
               </p>
             </Paper>
           </Grid>

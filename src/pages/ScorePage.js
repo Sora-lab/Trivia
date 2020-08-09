@@ -18,6 +18,7 @@ export default class ScorePage extends Component {
     super(props);
     this.state = {
       rows: [],
+      sortOrder: 'ascending',
     };
   }
   componentDidMount() {
@@ -90,6 +91,19 @@ export default class ScorePage extends Component {
       }
     }
     return points;
+  }
+
+  sortTable(columnId){
+    const rows = this.state.rows;
+    let sortOrder = this.state.sortOrder;
+    if(sortOrder === 'ascending'){
+      rows.sort((a, b)=>a[columnId] -b[columnId]);
+      sortOrder = 'descending';
+    } else {
+      rows.sort((a, b)=>b[columnId]-a[columnId]);
+      sortOrder = 'ascending';
+    }
+    this.setState({rows, sortOrder})
   }
 
   columns = [
@@ -173,7 +187,7 @@ export default class ScorePage extends Component {
   render() {
     const rows = this.state.rows;
     return (
-      <div style={{margin: '3em'}}>
+      <div style={{margin: '3em', padding: '2em', background: '#c2d1e8'}}>
         <header style={{padding: '2em', fontFamily: "'Rock Salt', cursive"}}>
           <h2>Score Card</h2>
         </header>
@@ -189,7 +203,7 @@ export default class ScorePage extends Component {
                         align={column.align}
                         style={{minWidth: column.minWidth}}
                       >
-                        <TableSortLabel>{column.label}</TableSortLabel>
+                        <TableSortLabel onClick={()=>this.sortTable(column.id)}>{column.label}</TableSortLabel>
                       </TableCell>
                     );
                   })}

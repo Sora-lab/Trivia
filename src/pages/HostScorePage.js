@@ -79,7 +79,7 @@ export default class HostScorePage extends Component {
     const title = titles ? titles.get(round) : '';
     const rows = allAnswerRows && round ? allAnswerRows.get(round) : [];
     const teams = this.state.teams;
-    console.log(title, round, rows, teams)
+    // console.log(title, round, rows, teams)
     if(teams === null){
      return null;
     } else {

@@ -21,6 +21,7 @@ import Remove from '@material-ui/icons/Remove';
 import SaveAlt from '@material-ui/icons/SaveAlt';
 import Search from '@material-ui/icons/Search';
 import ViewColumn from '@material-ui/icons/ViewColumn';
+import Typography from '@material-ui/core/Typography';
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -114,12 +115,12 @@ export default class ScoreTable extends Component {
     teamData.on('value', (snapshot) => {
       const teamDataVal = snapshot.val();
       // if (teamDataVal !== null) {
-        const locked = teamDataVal?.roundLocked ? teamDataVal.roundLocked : false;
-        // console.log(teamDataVal,  teamId);
-        // const points = teamDataVal.totalPoints;
-        const teamAnswersNotes = teamDataVal?.teamAnswersNotes;
-        const rows = this.makeRows(answerRows, teamAnswersNotes, teamId);
-        this.setState({rows, locked});
+      const locked = teamDataVal?.roundLocked ? teamDataVal.roundLocked : false;
+      // console.log(teamDataVal, teamId, locked);
+      // const points = teamDataVal.totalPoints;
+      const teamAnswersNotes = teamDataVal?.teamAnswersNotes;
+      const rows = this.makeRows(answerRows, teamAnswersNotes, teamId);
+      this.setState({rows, locked});
       // }
     });
   }
@@ -131,14 +132,15 @@ export default class ScoreTable extends Component {
     answerRows.forEach((row) => {
       const qNum = row.number;
       const answerNote = answersNotes && answersNotes[qNum];
-      // console.log(answersNotes)
+      // console.log(answerNote)
+      let mach = this.checkAnswer(answerNote?.teamAnswer, row.answer)
       newRows.push({
         key: row.key,
         qNumber: qNum,
         answer: row.answer,
         teamAnswer: answerNote?.teamAnswer,
         teamNote: answerNote?.teamNote,
-        match: false,
+        match: mach,
         points: answerNote?.points ? answerNote.points : 0,
       });
       totalPoints += 1;
@@ -147,6 +149,38 @@ export default class ScoreTable extends Component {
     return newRows;
   }
 
+  checkAnswer(teamAnswer="", answer=""){
+    // console.log(teamAnswer, 'answer', answer)
+    let answerArr = [];
+    let teamAnswerArr = [];
+    let teamAnswerArrLowerCase = [];
+    
+    let match = false;
+    if(answer.includes(',')){
+      answerArr = answer.split(',')
+    } else {
+      answerArr.push(answer)
+    }
+    if(teamAnswer.includes(',')){
+      teamAnswerArr = teamAnswer.split(',')
+    } else {
+      teamAnswerArr.push(teamAnswer)
+    }
+    teamAnswerArr.forEach(teamAnswer=>{
+      teamAnswerArrLowerCase.push(teamAnswer.toLowerCase());
+    })
+  
+    // console.log(teamAnswerArrLowerCase)
+    answerArr.forEach(answer => {
+      // console.log(answer)
+      let foo = answer.toLowerCase();
+      console.log(teamAnswerArrLowerCase.includes(foo))
+      if(match === false && teamAnswerArrLowerCase.includes(answer)){
+        match = true;
+      }
+    });
+    return match;
+  }
   columns = [
     {
       field: 'qNumber',
@@ -197,15 +231,15 @@ export default class ScoreTable extends Component {
   ];
 
   pointsOnChange(value, rowData) {
-    const qNum = rowData.qNumber
-//     answer: "deer"
-// key: 2
-// match: false
-// points: 0
-// qNumber: "Q2"
-// tableData: {id: 1, editCellList: Array(0)}
-// teamAnswer: undefined
-// teamNote: undefined
+    const qNum = rowData.qNumber;
+    //     answer: "deer"
+    // key: 2
+    // match: false
+    // points: 0
+    // qNumber: "Q2"
+    // tableData: {id: 1, editCellList: Array(0)}
+    // teamAnswer: undefined
+    // teamNote: undefined
     const teamId = this.state.teamId;
     const round = this.state.round;
     const refPath = `/teams/${teamId}/rounds/${round}/teamAnswersNotes/${qNum}`;
@@ -216,11 +250,16 @@ export default class ScoreTable extends Component {
     // console.log('render');
     const rows = this.state.rows || [];
     const locked = this.state.locked;
-    // const points = this.state.points;
-    // console.log(locked, points,)
+    // console.log(locked)
+    let lockedText = locked ? 'Yes' : 'Not yet';
     return (
       <MaterialTable
-        title={`${this.state.teamName}     Locked: ${locked}       Points: `}
+        title={
+          <>
+            <h2>{this.state.teamName}</h2>
+            <p style={{textAlign: 'right'}}>Locked: {lockedText}</p>
+          </>
+        }
         columns={this.columns}
         data={rows}
         icons={tableIcons}
