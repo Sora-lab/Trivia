@@ -80,35 +80,125 @@ export default class HostScorePage extends Component {
     const rows = allAnswerRows && round ? allAnswerRows.get(round) : [];
     const teams = this.state.teams;
     // console.log(title, round, rows, teams)
-    if(teams === null){
-     return null;
+    if (teams === null) {
+      return null;
     } else {
-    return (
-      <div style={{margin: '32px', padding: '32px'}}>
-        <Tabs
-          value={this.state.selectedTab}
-          onChange={(event, newValue) => this.handleTabChange(event, newValue)}
-          aria-label="trivia rounds"
-        >
-          <Tab label="Round 1" value={0} />
-          <Tab label="Round 2" value={1} />
-          <Tab label="Round 3" value={2} />
-          <Tab label="Round 4" value={3} />
-          <Tab label="Round 5" value={4} />
-          <Tab label="Round 6" value={5} />
-          <Tab label="Round 7" value={6} />
-          <Tab label="Round 8" value={7} />
-        </Tabs>
-        <div style={{paddingTop: '16px'}} role="tabpanel">
-          <ScoreTabConent
-            title={title}
-            round={round}
-            answerRows={rows}
-            teams={teams}
-          />
+      return (
+        <div style={{margin: '32px', padding: '32px'}}>
+          <Tabs
+            value={this.state.selectedTab}
+            onChange={(event, newValue) =>
+              this.handleTabChange(event, newValue)
+            }
+            aria-label="trivia rounds"
+          >
+            <Tab label="Round 1" value={0} />
+            <Tab label="Round 2" value={1} />
+            <Tab label="Round 3" value={2} />
+            <Tab label="Round 4" value={3} />
+            <Tab label="Round 5" value={4} />
+            <Tab label="Round 6" value={5} />
+            <Tab label="Round 7" value={6} />
+            <Tab label="Round 8" value={7} />
+          </Tabs>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 0}
+          >
+            <ScoreTabConent
+              title={title}
+              round={1}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 1}
+          >
+            <ScoreTabConent
+              title={title}
+              round={2}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 2}
+          >
+            <ScoreTabConent
+              title={title}
+              round={3}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 3}
+          >
+            <ScoreTabConent
+              title={title}
+              round={4}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 4}
+          >
+            <ScoreTabConent
+              title={title}
+              round={5}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 5}
+          >
+            <ScoreTabConent
+              title={title}
+              round={6}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 6}
+          >
+            <ScoreTabConent
+              title={title}
+              round={7}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
+          <div
+            style={{paddingTop: '16px'}}
+            role="tabpanel"
+            hidden={this.state.selectedTab !== 7}
+          >
+            <ScoreTabConent
+              title={title}
+              round={8}
+              answerRows={rows}
+              teams={teams}
+            />
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
   }
 }

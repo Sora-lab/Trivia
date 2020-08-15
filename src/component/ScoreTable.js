@@ -267,6 +267,7 @@ export default class ScoreTable extends Component {
         icons={tableIcons}
         options={{
           search: false,
+          pageSize: 10,
         }}
         cellEditable={{
           cellStyle: {},
