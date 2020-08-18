@@ -5,7 +5,7 @@ import App from './App';
 import * as firebase from 'firebase/app';
 import * as serviceWorker from './serviceWorker';
 const firebaseConfig = {
-  apiKey: 'AIzaSyA-9XWFknd2ifYkUa6EO8p0u87RKIv2SgE',
+  apiKey: 'put your API key in here',
   authDomain: 'ross-trivia.firebaseapp.com',
   databaseURL: 'https://ross-trivia.firebaseio.com',
   projectId: 'ross-trivia',
